@@ -2,144 +2,134 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Smileflix PWA</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Freedom Auto CMS</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
-  <link rel="icon" href="icon-192.png">
   <style>
     body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #000;
+      margin: 0; padding: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
       color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      background: #222;
+      width: 100%;
+      padding: 10px 20px;
       text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
       padding: 20px;
     }
     video {
-      width: 100%;
+      width: 90%;
       max-width: 600px;
       border-radius: 12px;
-      margin-top: 10px;
+      background: #000;
     }
-    #settings {
-      display: none;
-      background: #111;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 15px;
-    }
-    input, textarea {
+    .cms {
+      background: #1b1b1b;
+      padding: 20px;
+      border-radius: 10px;
       width: 90%;
-      margin: 5px 0;
-      padding: 8px;
-      border: none;
-      border-radius: 6px;
-      background: #222;
-      color: #fff;
+      max-width: 400px;
+      box-shadow: 0 0 10px #000;
     }
-    button {
-      padding: 8px 16px;
-      background: #ff0050;
-      color: #fff;
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
       border: none;
       border-radius: 6px;
+    }
+    input { background: #333; color: #fff; }
+    button {
+      background: #00b894;
+      color: #fff;
+      font-weight: bold;
       cursor: pointer;
-      margin-top: 10px;
+      transition: 0.3s;
+    }
+    button:hover { background: #019875; }
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.8em;
+      color: #777;
     }
   </style>
 </head>
 <body>
-  <h1 id="title">Loading…</h1>
-  <p id="desc"></p>
-  <video id="video" controls autoplay muted playsinline></video>
-  <footer id="updated"></footer>
+  <header>🎬 Freedom FM</header>
 
-  <button id="toggleSettings">⚙️ Settings</button>
+  <main>
+    <video id="videoPlayer" controls autoplay muted loop></video>
 
-  <div id="settings">
-    <h3>Edit Data</h3>
-    <input id="titleInput" placeholder="Title"><br>
-    <input id="linkInput" placeholder="Video Link (MP4 URL)"><br>
-    <input id="thumbInput" placeholder="Thumbnail URL"><br>
-    <textarea id="descInput" placeholder="Description"></textarea><br>
-    <input id="tokenInput" type="password" placeholder="GitHub Token"><br>
-    <button id="saveBtn">💾 Save</button>
-  </div>
+    <div class="cms">
+      <h3>Update Daily Video</h3>
+      <input id="titleInput" placeholder="Title">
+      <input id="descInput" placeholder="Description">
+      <input id="linkInput" placeholder="Video URL (MP4)">
+      <input id="thumbInput" placeholder="Thumbnail URL">
+      <button id="saveBtn">Save to GitHub</button>
+    </div>
+  </main>
+
+  <footer>© 2025 Smile WiFi — Auto PWA CMS</footer>
 
   <script>
-    const repoOwner = "YOUR_USERNAME";
-    const repoName = "YOUR_REPO";
-    const dataPath = "data.json";
-    const rawUrl = `https://${repoOwner}.github.io/${repoName}/${dataPath}`;
+    const DATA_URL = "https://smile-wifi.github.io/freedom-auto/data.json";
+    const WORKER_URL = "https://update-json.kaptenlanaja2024.workers.dev";
 
-    const titleEl = document.getElementById('title');
-    const descEl = document.getElementById('desc');
-    const videoEl = document.getElementById('video');
-    const updatedEl = document.getElementById('updated');
-    const settings = document.getElementById('settings');
+    async function loadData() {
+      try {
+        const res = await fetch(DATA_URL + '?v=' + Date.now());
+        const data = await res.json();
 
-    // Load Data
-    fetch(rawUrl + '?_=' + Date.now())
-      .then(res => res.json())
-      .then(data => {
-        titleEl.textContent = data.title || 'Untitled';
-        descEl.textContent = data.description || '';
-        videoEl.src = data.today_link;
-        updatedEl.textContent = 'Updated: ' + (data.updated || 'unknown');
-        document.getElementById('titleInput').value = data.title;
-        document.getElementById('linkInput').value = data.today_link;
-        document.getElementById('thumbInput').value = data.thumbnail;
-        document.getElementById('descInput').value = data.description;
-      })
-      .catch(() => {
-        titleEl.textContent = "Failed to load data.json 😢";
-      });
+        document.getElementById('videoPlayer').src = data.today_link;
+        document.getElementById('titleInput').value = data.title || "";
+        document.getElementById('descInput').value = data.description || "";
+        document.getElementById('linkInput').value = data.today_link || "";
+        document.getElementById('thumbInput').value = data.thumbnail || "";
+      } catch (e) {
+        console.error(e);
+      }
+    }
 
-    // Toggle settings
-    document.getElementById('toggleSettings').onclick = () => {
-      settings.style.display = settings.style.display === 'block' ? 'none' : 'block';
-    };
-
-    // Save data.json (GitHub API)
     document.getElementById('saveBtn').onclick = async () => {
-      const token = document.getElementById('tokenInput').value.trim();
-      if (!token) return alert("Enter GitHub Token first!");
-
-      const updatedData = {
+      const payload = {
         title: document.getElementById('titleInput').value,
         description: document.getElementById('descInput').value,
         today_link: document.getElementById('linkInput').value,
-        thumbnail: document.getElementById('thumbInput').value,
-        updated: new Date().toISOString().split('T')[0]
+        thumbnail: document.getElementById('thumbInput').value
       };
-
-      const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${dataPath}`;
-
-      const getRes = await fetch(apiUrl, { headers: { Authorization: `token ${token}` }});
-      const file = await getRes.json();
-
-      const res = await fetch(apiUrl, {
-        method: "PUT",
-        headers: {
-          "Authorization": `token ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: "Update data.json via PWA",
-          content: btoa(unescape(encodeURIComponent(JSON.stringify(updatedData, null, 2)))),
-          sha: file.sha
-        })
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
-
-      if (res.ok) alert("✅ data.json updated on GitHub!");
-      else alert("❌ Failed to update: " + res.statusText);
+      if (res.ok) {
+        alert("✅ data.json updated live!");
+        loadData();
+      } else {
+        alert("❌ Update failed. Check Worker settings.");
+      }
     };
 
-    // Register service worker (PWA)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
+    loadData();
   </script>
 </body>
 </html>
