@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Smileflix PWA</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="icon-192.png">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    video {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+    #settings {
+      display: none;
+      background: #111;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    input, textarea {
+      width: 90%;
+      margin: 5px 0;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+    }
+    button {
+      padding: 8px 16px;
+      background: #ff0050;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">Loading…</h1>
+  <p id="desc"></p>
+  <video id="video" controls autoplay muted playsinline></video>
+  <footer id="updated"></footer>
+
+  <button id="toggleSettings">⚙️ Settings</button>
+
+  <div id="settings">
+    <h3>Edit Data</h3>
+    <input id="titleInput" placeholder="Title"><br>
+    <input id="linkInput" placeholder="Video Link (MP4 URL)"><br>
+    <input id="thumbInput" placeholder="Thumbnail URL"><br>
+    <textarea id="descInput" placeholder="Description"></textarea><br>
+    <input id="tokenInput" type="password" placeholder="GitHub Token"><br>
+    <button id="saveBtn">💾 Save</button>
+  </div>
+
+  <script>
+    const repoOwner = "YOUR_USERNAME";
+    const repoName = "YOUR_REPO";
+    const dataPath = "data.json";
+    const rawUrl = `https://${repoOwner}.github.io/${repoName}/${dataPath}`;
+
+    const titleEl = document.getElementById('title');
+    const descEl = document.getElementById('desc');
+    const videoEl = document.getElementById('video');
+    const updatedEl = document.getElementById('updated');
+    const settings = document.getElementById('settings');
+
+    // Load Data
+    fetch(rawUrl + '?_=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        titleEl.textContent = data.title || 'Untitled';
+        descEl.textContent = data.description || '';
+        videoEl.src = data.today_link;
+        updatedEl.textContent = 'Updated: ' + (data.updated || 'unknown');
+        document.getElementById('titleInput').value = data.title;
+        document.getElementById('linkInput').value = data.today_link;
+        document.getElementById('thumbInput').value = data.thumbnail;
+        document.getElementById('descInput').value = data.description;
+      })
+      .catch(() => {
+        titleEl.textContent = "Failed to load data.json 😢";
+      });
+
+    // Toggle settings
+    document.getElementById('toggleSettings').onclick = () => {
+      settings.style.display = settings.style.display === 'block' ? 'none' : 'block';
+    };
+
+    // Save data.json (GitHub API)
+    document.getElementById('saveBtn').onclick = async () => {
+      const token = document.getElementById('tokenInput').value.trim();
+      if (!token) return alert("Enter GitHub Token first!");
+
+      const updatedData = {
+        title: document.getElementById('titleInput').value,
+        description: document.getElementById('descInput').value,
+        today_link: document.getElementById('linkInput').value,
+        thumbnail: document.getElementById('thumbInput').value,
+        updated: new Date().toISOString().split('T')[0]
+      };
+
+      const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${dataPath}`;
+
+      const getRes = await fetch(apiUrl, { headers: { Authorization: `token ${token}` }});
+      const file = await getRes.json();
+
+      const res = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Authorization": `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Update data.json via PWA",
+          content: btoa(unescape(encodeURIComponent(JSON.stringify(updatedData, null, 2)))),
+          sha: file.sha
+        })
+      });
+
+      if (res.ok) alert("✅ data.json updated on GitHub!");
+      else alert("❌ Failed to update: " + res.statusText);
+    };
+
+    // Register service worker (PWA)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
