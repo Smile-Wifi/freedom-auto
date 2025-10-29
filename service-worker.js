@@ -1,7 +1,7 @@
 self.addEventListener("install", e => {
   e.waitUntil(
-    caches.open("smileflix-v1").then(cache => {
-      return cache.addAll(["/", "/index.html", "/manifest.json"]);
+    caches.open("pwa-cache").then(cache => {
+      return cache.addAll(["/", "/index.html", "/data.json"]);
     })
   );
 });
