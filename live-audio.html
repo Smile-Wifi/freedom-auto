@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Freedom FM 104.1 — Live Audio</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    <h1>Freedom FM Live Audio</h1>
+  </nav>
+
+  <div class="side-panel" id="sidePanel">
+    <div class="side-panel-header">
+      <h2>Menu</h2>
+      <button class="close-btn" id="closeBtn">&times;</button>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link"><i class="fas fa-video"></i> Video Stream</a></li>
+      <li><a href="live-audio.html" class="nav-link active"><i class="fas fa-microphone"></i> Live Audio</a></li>
+    </ul>
+  </div>
+  <div class="overlay" id="overlay"></div>
+
+  <main class="main-content">
+    <section class="live-section">
+      <div class="live-header"><div class="live-dot"></div><h3>Now Streaming: Freedom FM Live</h3></div>
+      <p style="text-align:center;margin-top:8px;color:#cfeff0">Nonstop music and talk shows</p>
+
+      <div style="max-width:820px;margin:18px auto;">
+        <div class="audio-card" style="height:auto;padding:18px;">
+          <audio id="liveAudio" src="https://stream.zeno.fm/example.mp3"></audio>
+          <div class="player-controls" style="margin-top:8px;">
+            <button id="playBtn"><i class="fas fa-play"></i></button>
+            <button id="pauseBtn"><i class="fas fa-pause"></i></button>
+            <button id="volumeBtn"><i class="fas fa-volume-up"></i></button>
+          </div>
+          <div class="listeners" id="listenersCount">👥 0 listeners online</div>
+        </div>
+      </div>
+
+      <div class="chat-box">
+        <h4>💬 Live Chat</h4>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+          <input id="chatInput" placeholder="Say hi..." />
+          <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase v12 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDA6pJUt5qRFFTaV0vOa5GTnW9VlOfVyH0",
+      authDomain: "freedom-fm-5a75b.firebaseapp.com",
+      databaseURL: "https://freedom-fm-5a75b-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "freedom-fm-5a75b",
+      storageBucket: "freedom-fm-5a75b.firebasestorage.app",
+      messagingSenderId: "209973948387",
+      appId: "1:209973948387:web:0cebd40b408a9d4bdd7ad6",
+      measurementId: "G-2CW383NGGN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    window.firebaseApp = app;
+    window.database = database;
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
