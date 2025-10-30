@@ -1,66 +1,75 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Freedom FM — Auto CMS</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<style>
-:root{
-  --bg:#111;--panel:#1b1b1b;--accent:#00b894;--muted:#777;
-}
-*{box-sizing:border-box;}
-body{
-  margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;
-  background:var(--bg);color:#fff;display:flex;flex-direction:column;align-items:center;
-  min-height:100vh;overflow-x:hidden;
-}
-header{
-  background:#222;width:100%;padding:18px;text-align:center;font-weight:bold;font-size:1.2em;
-  position:relative;z-index:10;
-}
-.menu-btn{position:absolute;right:14px;top:8px;background:none;border:none;color:#fff;font-size:1.6em;cursor:pointer;}
-.overlay{position:fixed;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(6px);
-  background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.3s;z-index:9;}
-.overlay.show{opacity:1;visibility:visible;}
-.sidebar{
-  position:fixed;left:-260px;top:0;width:240px;height:100%;background:rgba(20,20,20,.95);
-  box-shadow:2px 0 15px rgba(0,0,0,.5);transition:.3s;display:flex;flex-direction:column;padding-top:60px;z-index:10;
-}
-.sidebar.open{left:0;}
-.sidebar a,.sidebar button{
-  color:#fff;padding:12px 18px;text-decoration:none;background:none;border:none;text-align:left;font-size:1.05em;cursor:pointer;
-}
-.sidebar a:hover,.sidebar button:hover{background:#2c2c2c;}
-main{width:100%;max-width:980px;margin:18px;display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
-.player-panel{background:var(--panel);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.6);}
-video{width:100%;border-radius:8px;background:#000;}
-.radio-box,.cms,.old-videos,.schedule-box{
-  background:var(--panel);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.5);
-}
-.small{font-size:.9em;color:var(--muted);}
-input[type=text],input[type=url]{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid #2a2a2a;background:#222;color:#fff;}
-.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:bold;}
-.btn:disabled{background:#555;cursor:not-allowed;opacity:0.6;}
-.schedule-list{display:flex;flex-direction:column;gap:8px;}
-.sched-item{display:grid;grid-template-columns:100px 1fr 120px 34px;gap:6px;align-items:center;}
-.old-videos ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
-.old-videos li{padding:8px;background:#151515;border-radius:6px;cursor:pointer;transition:0.2s;}
-.old-videos li:hover{background:#222;}
-.toast{
-  position:fixed;bottom:20px;right:20px;background:#00b894;padding:10px 18px;border-radius:8px;
-  color:#fff;font-weight:bold;box-shadow:0 0 10px #000;opacity:0;transition:.4s;z-index:100;
-}
-.toast.show{opacity:1;}
-.toast.error{background:#e74c3c;}
-@media(max-width:980px){main{grid-template-columns:1fr;}video{width:100%;}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Freedom FM — Video Player</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <style>
+    :root {
+      --bg: #111;
+      --panel: #1b1b1b;
+      --accent: #00b894;
+      --muted: #777;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg); color: #fff; display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; overflow-x: hidden;
+    }
+    header {
+      background: #222; width: 100%; padding: 18px; text-align: center; font-weight: bold; font-size: 1.2em;
+      position: relative; z-index: 10;
+    }
+    .menu-btn {
+      position: absolute; right: 14px; top: 8px; background: none; border: none; color: #fff; font-size: 1.6em; cursor: pointer;
+    }
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px);
+      background: rgba(0,0,0,.45); opacity: 0; visibility: hidden; transition: .3s; z-index: 9;
+    }
+    .overlay.show { opacity: 1; visibility: visible; }
+    .sidebar {
+      position: fixed; left: -260px; top: 0; width: 240px; height: 100%; background: rgba(20,20,20,.95);
+      box-shadow: 2px 0 15px rgba(0,0,0,.5); transition: .3s; display: flex; flex-direction: column; padding-top: 60px; z-index: 10;
+    }
+    .sidebar.open { left: 0; }
+    .sidebar a, .sidebar button {
+      color: #fff; padding: 12px 18px; text-decoration: none; background: none; border: none; text-align: left; font-size: 1.05em; cursor: pointer;
+    }
+    .sidebar a:hover, .sidebar button:hover { background: #2c2c2c; }
+    main { width: 100%; max-width: 980px; margin: 18px; }
+    .player-panel {
+      background: var(--panel); padding: 16px; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.6);
+    }
+    video { width: 100%; border-radius: 8px; background: #000; }
+    .cms {
+      background: var(--panel); padding: 16px; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.5); margin-top: 18px;
+    }
+    input[type=text], input[type=url] {
+      width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #2a2a2a; background: #222; color: #fff; font-size: 1em;
+    }
+    .btn {
+      display: inline-block; padding: 10px 16px; border-radius: 8px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-weight: bold; font-size: 1em;
+    }
+    .btn:disabled { background: #555; cursor: not-allowed; opacity: 0.6; }
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; background: #00b894; padding: 10px 18px; border-radius: 8px;
+      color: #fff; font-weight: bold; box-shadow: 0 0 10px #000; opacity: 0; transition: .4s; z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #e74c3c; }
+    footer { text-align: center; padding: 12px; color: var(--muted); margin-top: auto; }
+    @media (max-width: 980px) { main { margin: 12px; } }
+  </style>
 </head>
 <body>
+
 <header>
   <button class="menu-btn" id="menuBtn">Menu</button>
-  Freedom FM CMS
+  Freedom FM Video
 </header>
 
 <div class="overlay" id="overlay"></div>
@@ -74,50 +83,23 @@ input[type=text],input[type=url]{width:100%;padding:8px;margin:6px 0;border-radi
 <main>
   <div class="player-panel">
     <video id="videoPlayer" controls autoplay muted loop></video>
-    <div style="margin-top:10px;font-weight:bold;" id="videoTitle"></div>
-    <div class="small" id="videoDesc"></div>
-
-    <div class="radio-box" style="margin-top:12px;">
-      <h3>Radio Live</h3>
-      <div id="radioTitleDisplay" style="font-weight:bold;"></div>
-      <div id="radioDesc" class="small"></div>
-      <audio id="radioPlayer" controls style="width:100%;margin-top:8px;"></audio>
-
-      <div class="schedule-box" style="margin-top:12px;">
-        <h3>Program Schedule</h3>
-        <div id="scheduleDisplay" class="schedule-list"></div>
-      </div>
-    </div>
+    <div style="margin-top:10px; font-weight:bold;" id="videoTitle">Loading...</div>
   </div>
 
+  <!-- Facebook-style CMS -->
   <div class="cms" id="cmsBox" style="display:none;">
-    <h3>Update Daily Video & Radio</h3>
+    <h3>Update Video</h3>
     <input id="titleInput" placeholder="Video Title">
-    <input id="descInput" placeholder="Video Description">
     <input id="linkInput" placeholder="Video URL (MP4)">
-    <input id="thumbInput" placeholder="Thumbnail URL">
-    <input id="radioTitleInput" placeholder="Radio Program Title">
-    <input id="radioStreamInput" placeholder="Radio Stream URL">
-    <input id="radioDescInput" placeholder="Radio Description">
-
-    <h3>Editable Program Schedule</h3>
-    <div class="small">Add or edit radio programs below.</div>
-    <div id="scheduleEditor" class="schedule-list" style="margin-top:6px;"></div>
-    <button class="btn" id="addScheduleBtn">＋ Add Program</button>
-    <button class="btn" id="saveBtn" style="margin-top:6px;">Save to GitHub</button>
-  </div>
-
-  <div class="old-videos" id="oldVideosBox">
-    <h3>Old Videos</h3>
-    <ul id="oldVideoList"></ul>
+    <button class="btn" id="saveBtn" style="margin-top:12px;">Save to GitHub</button>
   </div>
 </main>
 
-<footer style="text-align:center;padding:12px;color:var(--muted);">
-© 2025 Smile WiFi — Auto PWA CMS
+<footer>
+  © 2025 Smile WiFi — Video CMS
 </footer>
 
-<div id="toast" class="toast">Saved Successfully</div>
+<div id="toast" class="toast">Saved!</div>
 
 <script>
 /* === CONFIG === */
@@ -126,37 +108,22 @@ const WORKER_URL = "https://update-json.kaptenlanaja2024.workers.dev";
 const PASSWORD = "freedom2025";
 
 /* === DOM Elements === */
-const menuBtn      = document.getElementById('menuBtn');
-const sidebar      = document.getElementById('sidebar');
-const overlay      = document.getElementById('overlay');
-const cmsBox       = document.getElementById('cmsBox');
-const loginLink    = document.getElementById('loginLink');
-const logoutLink   = document.getElementById('logoutLink');
-const cmsLink      = document.getElementById('cmsLink');
-const saveBtn      = document.getElementById('saveBtn');
-const addScheduleBtn = document.getElementById('addScheduleBtn');
+const menuBtn     = document.getElementById('menuBtn');
+const sidebar     = document.getElementById('sidebar');
+const overlay     = document.getElementById('overlay');
+const cmsBox      = document.getElementById('cmsBox');
+const loginLink   = document.getElementById('loginLink');
+const logoutLink  = document.getElementById('logoutLink');
+const cmsLink     = document.getElementById('cmsLink');
+const saveBtn     = document.getElementById('saveBtn');
 
-const videoPlayer      = document.getElementById('videoPlayer');
-const videoTitle       = document.getElementById('videoTitle');
-const videoDesc        = document.getElementById('videoDesc');
-const radioPlayer      = document.getElementById('radioPlayer');
-const radioTitleDisplay= document.getElementById('radioTitleDisplay');
-const radioDesc        = document.getElementById('radioDesc');
-const scheduleDisplay  = document.getElementById('scheduleDisplay');
-const oldVideoList     = document.getElementById('oldVideoList');
-const scheduleEditor   = document.getElementById('scheduleEditor');
+const videoPlayer = document.getElementById('videoPlayer');
+const videoTitle  = document.getElementById('videoTitle');
 
-const titleInput   = document.getElementById('titleInput');
-const linkInput    = document.getElementById('linkInput');
+const titleInput  = document.getElementById('titleInput');
+const linkInput   = document.getElementById('linkInput');
 
-/* hidden inputs – still needed for the worker */
-const descInput        = document.getElementById('descInput');
-const thumbInput       = document.getElementById('thumbInput');
-const radioTitleInput  = document.getElementById('radioTitleInput');
-const radioStreamInput = document.getElementById('radioStreamInput');
-const radioDescInput   = document.getElementById('radioDescInput');
-
-const toast = document.getElementById('toast');
+const toast       = document.getElementById('toast');
 
 /* === Sidebar === */
 menuBtn.onclick = () => {
@@ -174,7 +141,7 @@ loginLink.onclick = () => {
   if (pw === PASSWORD) {
     sessionStorage.setItem('cmsAuth', 'true');
     showCms();
-    showToast("Logged in successfully!");
+    showToast("Logged in!");
   } else {
     alert("Incorrect password");
   }
@@ -187,7 +154,7 @@ logoutLink.onclick = () => {
 };
 
 cmsLink.onclick = () => {
-  if (!sessionStorage.getItem('cmsAuth')) return alert("Login required first.");
+  if (!sessionStorage.getItem('cmsAuth')) return alert("Login required.");
   showCms();
 };
 
@@ -201,200 +168,79 @@ function showToast(msg, isError = false) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-/* === Data === */
+/* === Load Data === */
 let data = {};
 
 async function loadData() {
   try {
     const r = await fetch(DATA_URL + '?v=' + Date.now(), { cache: 'no-store' });
-    if (!r.ok) throw new Error("Failed to fetch data.json");
+    if (!r.ok) throw new Error("Failed");
     data = await r.json();
   } catch (e) {
-    console.warn("Using fallback data", e);
+    console.warn("Fallback data", e);
     data = {
-      title: "Freedom FM Daily Show",
-      description: "Auto CMS Demo Video",
-      today_link: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      thumbnail: "",
-      radio_stream: "https://icecast.omroep.nl/3fm-sb-mp3",
-      radio_title: "Morning Live Radio",
-      radio_description: "Your daily FM hits and talks",
-      radio_schedule: [
-        { time: "06:00 AM", program: "Morning Vibes", host: "DJ Alex" },
-        { time: "09:00 AM", program: "News Hour", host: "Sarah Lee" },
-        { time: "12:00 PM", program: "Lunch Beats", host: "MC Jay" },
-        { time: "03:00 PM", program: "Afternoon Groove", host: "DJ Mia" },
-        { time: "06:00 PM", program: "Freedom Night Show", host: "Captain L" }
-      ],
-      old_videos: []
+      title: "Big Buck Bunny",
+      today_link: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
     };
   }
-  displayData();
-}
-
-function displayData() {
-  videoPlayer.src = data.today_link || '';
-  videoTitle.innerText = data.title || '';
-  videoDesc.innerText = data.description || '';
-  radioPlayer.src = data.radio_stream || '';
-  radioTitleDisplay.innerText = data.radio_title || '';
-  radioDesc.innerText = data.radio_description || '';
-  renderSchedule();
-  renderOldVideos();
+  displayVideo();
   if (sessionStorage.getItem('cmsAuth')) fillCms();
 }
 
-/* --- Schedule --------------------------------------------------- */
-function renderSchedule() {
-  const s = data.radio_schedule || [];
-  scheduleDisplay.innerHTML = '';
-  s.forEach(i => {
-    const d = document.createElement('div');
-    d.style.background = '#151515';
-    d.style.padding = '6px';
-    d.style.borderRadius = '6px';
-    d.innerHTML = `<b>${escapeHtml(i.time || '')}</b> — ${escapeHtml(i.program || '')} <span style="color:#888">(${escapeHtml(i.host || '')})</span>`;
-    scheduleDisplay.appendChild(d);
-  });
+function displayVideo() {
+  videoPlayer.src = data.today_link || '';
+  videoTitle.innerText = data.title || 'No Title';
+  videoPlayer.load();
 }
 
-/* --- Old Videos ------------------------------------------------- */
-function renderOldVideos() {
-  oldVideoList.innerHTML = '';
-  (data.old_videos || []).forEach(v => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <div><strong>${escapeHtml(v.title)}</strong> — ${escapeHtml(v.date || 'No date')}</div>
-      <div class="small" style="margin-top:4px;">${escapeHtml(v.description || '')}</div>
-    `;
-    li.onclick = () => {
-      videoPlayer.src = v.link;
-      videoTitle.innerText = v.title;
-      videoDesc.innerText = v.description || '';
-      videoPlayer.play();
-      document.querySelector('.player-panel').scrollIntoView({ behavior: 'smooth' });
-    };
-    oldVideoList.appendChild(li);
-  });
-}
-
-/* === CMS Editor (Facebook style) ================================ */
+/* === CMS Fill === */
 function fillCms() {
   titleInput.value = data.title || '';
   linkInput.value  = data.today_link || '';
-
-  /* keep hidden fields in sync – they are still sent to the worker */
-  descInput.value        = data.description || '';
-  thumbInput.value       = data.thumbnail || '';
-  radioTitleInput.value  = data.radio_title || '';
-  radioStreamInput.value = data.radio_stream || '';
-  radioDescInput.value   = data.radio_description || '';
-  renderScheduleEditor();
 }
 
-/* schedule editor – still works, just hidden from the UI */
-function renderScheduleEditor() {
-  scheduleEditor.innerHTML = '';
-  const s = data.radio_schedule || [];
-  s.forEach((r, i) => {
-    const row = document.createElement('div');
-    row.className = 'sched-item';
-    row.innerHTML = `
-      <input value="${escapeHtml(r.time || '')}" placeholder="Time">
-      <input value="${escapeHtml(r.program || '')}" placeholder="Program">
-      <input value="${escapeHtml(r.host || '')}" placeholder="Host">
-      <button style="background:none;border:none;color:#ff7675;cursor:pointer;font-size:1.2em;">Remove</button>
-    `;
-    row.querySelector('button').onclick = () => {
-      data.radio_schedule.splice(i, 1);
-      renderScheduleEditor();
-      renderSchedule();
-    };
-    scheduleEditor.appendChild(row);
-  });
-}
-addScheduleBtn.onclick = () => {
-  data.radio_schedule.push({ time: '', program: '', host: '' });
-  renderScheduleEditor();
-};
-
-/* === SAVE (Facebook-style) ===================================== */
+/* === SAVE === */
 saveBtn.onclick = async () => {
   const newTitle = titleInput.value.trim();
   const newLink  = linkInput.value.trim();
 
   if (!newTitle || !newLink) {
-    return showToast("Video Title and Video URL are required!", true);
+    return showToast("Title and URL are required!", true);
   }
 
-  /* ---- update the in-memory object ---- */
-  data.title      = newTitle;
-  data.today_link = newLink;
-
-  /* keep the rest unchanged (radio, schedule, etc.) */
-  data.description       = descInput.value.trim();
-  data.thumbnail         = thumbInput.value.trim();
-  data.radio_title       = radioTitleInput.value.trim() || data.radio_title;   // fallback
-  data.radio_stream      = radioStreamInput.value.trim() || data.radio_stream;
-  data.radio_description = radioDescInput.value.trim();
-
-  /* schedule */
-  const rows = document.querySelectorAll('#scheduleEditor .sched-item');
-  data.radio_schedule = [...rows].map(r => {
-    const i = r.querySelectorAll('input');
-    return { time: i[0].value.trim(), program: i[1].value.trim(), host: i[2].value.trim() };
-  }).filter(p => p.program);
-
-  /* ---- old-videos history ---- */
-  const last = data.old_videos?.[0];
-  if (!last || last.link !== data.today_link) {
-    const entry = {
-      title: data.title,
-      description: data.description,
-      link: data.today_link,
-      thumbnail: data.thumbnail,
-      date: new Date().toLocaleDateString('en-GB')
-    };
-    data.old_videos = [entry, ...(data.old_videos || []).slice(0, 9)];
-  }
-
-  /* ---- send to Cloudflare Worker ---- */
   saveBtn.disabled = true;
   saveBtn.textContent = "Saving...";
+
+  const payload = { title: newTitle, today_link: newLink };
 
   try {
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: "Unknown error" }));
-      throw new Error(err.error || `HTTP ${res.status}`);
+      const err = await res.json().catch(() => ({ error: "Failed" }));
+      throw new Error(err.error || "HTTP " + res.status);
     }
 
-    showToast("Saved to GitHub!");
-    await loadData();               // refresh everything
+    showToast("Saved! Video updated.");
+    data = payload;
+    displayVideo();
   } catch (e) {
     console.error(e);
-    showToast(`Save failed: ${e.message}`, true);
+    showToast("Save failed: " + e.message, true);
   } finally {
     saveBtn.disabled = false;
     saveBtn.textContent = "Save to GitHub";
   }
 };
 
-/* === Utility === */
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
 /* === Init === */
 loadData();
 if (sessionStorage.getItem('cmsAuth')) setTimeout(showCms, 500);
 </script>
+
 </body>
 </html>
