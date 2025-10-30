@@ -1,91 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Freedom FM 104.1 — Video Stream</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freedom FM 104.1</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
-    <h1>Freedom FM 104.1</h1>
-  </nav>
+    <!-- Hamburger Menu -->
+    <nav class="navbar">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <h1>Live Stream</h1>
+    </nav>
 
-  <div class="side-panel" id="sidePanel">
-    <div class="side-panel-header">
-      <h2>Menu</h2>
-      <button class="close-btn" id="closeBtn">&times;</button>
-    </div>
-    <ul class="nav-links">
-      <li><a href="index.html" class="nav-link active"><i class="fas fa-video"></i> Video Stream</a></li>
-      <li><a href="live-audio.html" class="nav-link"><i class="fas fa-microphone"></i> Live Audio</a></li>
-      <li><a href="#cms-login" class="nav-link" id="cmsLoginBtn"><i class="fas fa-cog"></i> CMS Login</a></li>
-    </ul>
-  </div>
-  <div class="overlay" id="overlay"></div>
-
-  <main class="main-content">
-    <div class="video-section">
-      <h2 id="videoTitle">🎥 Featured Live Stream</h2>
-      <div class="video-container">
-        <iframe id="facebookVideo"
-          src="https://www.facebook.com/plugins/video.php?height=315&href=https://www.facebook.com/facebook/videos/10153231379946729/&show_text=false&width=560"
-          width="100%" height="100%" style="border:none;overflow:hidden;" allowfullscreen
-          allow="autoplay; encrypted-media; picture-in-picture"></iframe>
-      </div>
+    <!-- Side Panel -->
+    <div class="side-panel" id="sidePanel">
+        <div class="side-panel-header">
+            <h2>Menu</h2>
+            <button class="close-btn" id="closeBtn">&times;</button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#cms-login" class="nav-link" id="cmsLoginBtn"><i class="fas fa-cog"></i> CMS Login</a></li>
+            <li><a href="#settings" class="nav-link"><i class="fas fa-tools"></i> Settings</a></li>
+        </ul>
     </div>
 
-    <div class="chat-box">
-      <h4>💬 Live Chat</h4>
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-input">
-        <input id="chatInput" placeholder="Type a message..." />
-        <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-      </div>
-      <div class="listeners" id="listenersCount">👥 0 listeners online</div>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="video-section">
+                <h2 id="videoTitle">Featured Facebook Video</h2>
+                <div class="video-container" id="videoContainer">
+                    <div class="facebook-video-container">
+                        <iframe 
+                            id="facebookVideo"
+                            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Ffacebook%2Fvideos%2F10153231379946729%2F&show_text=false&width=476&t=0"
+                            width="100%"
+                            height="auto"
+                            style="border:none;overflow:hidden;aspect-ratio:16/9;"
+                            scrolling="no"
+                            frameborder="0"
+                            allowfullscreen="true"
+                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                            allowFullScreen="true">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CMS Login Modal -->
+    <div class="modal" id="cmsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>CMS Login</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form id="cmsLoginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
     </div>
-  </main>
 
-  <!-- CMS Modal -->
-  <div class="modal" id="cmsModal">
-    <div class="modal-content">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <h2 style="color:#7efcff">CMS Login</h2>
-        <button class="close-modal" id="closeModal">&times;</button>
-      </div>
-      <form id="cmsLoginForm">
-        <div class="form-group"><label>Username</label><input type="text" id="username" required></div>
-        <div class="form-group"><label>Password</label><input type="password" id="password" required></div>
-        <button class="btn-primary" type="submit">Login</button>
-      </form>
+    <!-- CMS Dashboard Modal -->
+    <div class="modal" id="cmsDashboard">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>CMS Dashboard</h2>
+                <button class="close-modal" id="closeDashboard">&times;</button>
+            </div>
+            <div class="cms-content">
+                <div class="form-group">
+                    <label for="facebookUrl">Facebook Video URL:</label>
+                    <input type="url" id="facebookUrl" placeholder="https://www.facebook.com/watch/?v=VIDEO_ID">
+                </div>
+                <div class="form-group">
+                    <label for="videoTitleInput">Video Title:</label>
+                    <input type="text" id="videoTitleInput" placeholder="Enter video title">
+                </div>
+                <button type="button" class="btn-primary" id="updateVideo">Update Video</button>
+                <button type="button" class="btn-secondary" id="saveToGitHub">Save to GitHub</button>
+                <div id="statusMessage" class="status-message"></div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Firebase v12 -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDA6pJUt5qRFFTaV0vOa5GTnW9VlOfVyH0",
-      authDomain: "freedom-fm-5a75b.firebaseapp.com",
-      databaseURL: "https://freedom-fm-5a75b-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "freedom-fm-5a75b",
-      storageBucket: "freedom-fm-5a75b.firebasestorage.app",
-      messagingSenderId: "209973948387",
-      appId: "1:209973948387:web:0cebd40b408a9d4bdd7ad6",
-      measurementId: "G-2CW383NGGN"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-    window.firebaseApp = app;
-    window.database = database;
-  </script>
-
-  <script src="script.js"></script>
-  <script src="github-config.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
