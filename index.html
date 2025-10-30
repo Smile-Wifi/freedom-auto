@@ -126,33 +126,36 @@ const WORKER_URL = "https://update-json.kaptenlanaja2024.workers.dev";
 const PASSWORD = "freedom2025";
 
 /* === DOM Elements === */
-const menuBtn = document.getElementById('menuBtn');
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('overlay');
-const cmsBox = document.getElementById('cmsBox');
-const loginLink = document.getElementById('loginLink');
-const logoutLink = document.getElementById('logoutLink');
-const cmsLink = document.getElementById('cmsLink');
-const saveBtn = document.getElementById('saveBtn');
+const menuBtn      = document.getElementById('menuBtn');
+const sidebar      = document.getElementById('sidebar');
+const overlay      = document.getElementById('overlay');
+const cmsBox       = document.getElementById('cmsBox');
+const loginLink    = document.getElementById('loginLink');
+const logoutLink   = document.getElementById('logoutLink');
+const cmsLink      = document.getElementById('cmsLink');
+const saveBtn      = document.getElementById('saveBtn');
 const addScheduleBtn = document.getElementById('addScheduleBtn');
 
-const videoPlayer = document.getElementById('videoPlayer');
-const videoTitle = document.getElementById('videoTitle');
-const videoDesc = document.getElementById('videoDesc');
-const radioPlayer = document.getElementById('radioPlayer');
-const radioTitleDisplay = document.getElementById('radioTitleDisplay');
-const radioDesc = document.getElementById('radioDesc');
-const scheduleDisplay = document.getElementById('scheduleDisplay');
-const oldVideoList = document.getElementById('oldVideoList');
-const scheduleEditor = document.getElementById('scheduleEditor');
+const videoPlayer      = document.getElementById('videoPlayer');
+const videoTitle       = document.getElementById('videoTitle');
+const videoDesc        = document.getElementById('videoDesc');
+const radioPlayer      = document.getElementById('radioPlayer');
+const radioTitleDisplay= document.getElementById('radioTitleDisplay');
+const radioDesc        = document.getElementById('radioDesc');
+const scheduleDisplay  = document.getElementById('scheduleDisplay');
+const oldVideoList     = document.getElementById('oldVideoList');
+const scheduleEditor   = document.getElementById('scheduleEditor');
 
-const titleInput = document.getElementById('titleInput');
-const descInput = document.getElementById('descInput');
-const linkInput = document.getElementById('linkInput');
-const thumbInput = document.getElementById('thumbInput');
-const radioTitleInput = document.getElementById('radioTitleInput');
+const titleInput   = document.getElementById('titleInput');
+const linkInput    = document.getElementById('linkInput');
+
+/* hidden inputs – still needed for the worker */
+const descInput        = document.getElementById('descInput');
+const thumbInput       = document.getElementById('thumbInput');
+const radioTitleInput  = document.getElementById('radioTitleInput');
 const radioStreamInput = document.getElementById('radioStreamInput');
-const radioDescInput = document.getElementById('radioDescInput');
+const radioDescInput   = document.getElementById('radioDescInput');
+
 const toast = document.getElementById('toast');
 
 /* === Sidebar === */
@@ -184,15 +187,11 @@ logoutLink.onclick = () => {
 };
 
 cmsLink.onclick = () => {
-  if (!sessionStorage.getItem('cmsAuth')) {
-    return alert("Login required first.");
-  }
+  if (!sessionStorage.getItem('cmsAuth')) return alert("Login required first.");
   showCms();
 };
 
-function showCms() {
-  cmsBox.style.display = 'block';
-}
+function showCms() { cmsBox.style.display = 'block'; }
 
 /* === Toast === */
 function showToast(msg, isError = false) {
@@ -245,6 +244,7 @@ function displayData() {
   if (sessionStorage.getItem('cmsAuth')) fillCms();
 }
 
+/* --- Schedule --------------------------------------------------- */
 function renderSchedule() {
   const s = data.radio_schedule || [];
   scheduleDisplay.innerHTML = '';
@@ -258,6 +258,7 @@ function renderSchedule() {
   });
 }
 
+/* --- Old Videos ------------------------------------------------- */
 function renderOldVideos() {
   oldVideoList.innerHTML = '';
   (data.old_videos || []).forEach(v => {
@@ -277,18 +278,21 @@ function renderOldVideos() {
   });
 }
 
-/* === CMS Editor === */
+/* === CMS Editor (Facebook style) ================================ */
 function fillCms() {
   titleInput.value = data.title || '';
-  descInput.value = data.description || '';
-  linkInput.value = data.today_link || '';
-  thumbInput.value = data.thumbnail || '';
-  radioTitleInput.value = data.radio_title || '';
+  linkInput.value  = data.today_link || '';
+
+  /* keep hidden fields in sync – they are still sent to the worker */
+  descInput.value        = data.description || '';
+  thumbInput.value       = data.thumbnail || '';
+  radioTitleInput.value  = data.radio_title || '';
   radioStreamInput.value = data.radio_stream || '';
-  radioDescInput.value = data.radio_description || '';
+  radioDescInput.value   = data.radio_description || '';
   renderScheduleEditor();
 }
 
+/* schedule editor – still works, just hidden from the UI */
 function renderScheduleEditor() {
   scheduleEditor.innerHTML = '';
   const s = data.radio_schedule || [];
@@ -304,63 +308,57 @@ function renderScheduleEditor() {
     row.querySelector('button').onclick = () => {
       data.radio_schedule.splice(i, 1);
       renderScheduleEditor();
-      renderSchedule(); // Live update
+      renderSchedule();
     };
     scheduleEditor.appendChild(row);
   });
 }
-
 addScheduleBtn.onclick = () => {
   data.radio_schedule.push({ time: '', program: '', host: '' });
   renderScheduleEditor();
 };
 
-/* === Save to GitHub via Worker === */
+/* === SAVE (Facebook-style) ===================================== */
 saveBtn.onclick = async () => {
-  // === Collect & Validate ===
   const newTitle = titleInput.value.trim();
-  const newLink = linkInput.value.trim();
-  const newRadioTitle = radioTitleInput.value.trim();
-  const newRadioStream = radioStreamInput.value.trim();
+  const newLink  = linkInput.value.trim();
 
-  if (!newTitle || !newLink || !newRadioTitle || !newRadioStream) {
-    return showToast("Title, Video URL, Radio Title, and Stream URL are required!", true);
+  if (!newTitle || !newLink) {
+    return showToast("Video Title and Video URL are required!", true);
   }
 
-  // === Update data ===
-  data.title = newTitle;
-  data.description = descInput.value.trim();
+  /* ---- update the in-memory object ---- */
+  data.title      = newTitle;
   data.today_link = newLink;
-  data.thumbnail = thumbInput.value.trim();
-  data.radio_title = newRadioTitle;
-  data.radio_stream = newRadioStream;
+
+  /* keep the rest unchanged (radio, schedule, etc.) */
+  data.description       = descInput.value.trim();
+  data.thumbnail         = thumbInput.value.trim();
+  data.radio_title       = radioTitleInput.value.trim() || data.radio_title;   // fallback
+  data.radio_stream      = radioStreamInput.value.trim() || data.radio_stream;
   data.radio_description = radioDescInput.value.trim();
 
-  // === Schedule ===
+  /* schedule */
   const rows = document.querySelectorAll('#scheduleEditor .sched-item');
   data.radio_schedule = [...rows].map(r => {
-    const inputs = r.querySelectorAll('input');
-    return {
-      time: inputs[0].value.trim(),
-      program: inputs[1].value.trim(),
-      host: inputs[2].value.trim()
-    };
-  }).filter(p => p.program); // Remove empty
+    const i = r.querySelectorAll('input');
+    return { time: i[0].value.trim(), program: i[1].value.trim(), host: i[2].value.trim() };
+  }).filter(p => p.program);
 
-  // === Old Videos: Add only if new ===
-  const lastVideo = data.old_videos?.[0];
-  if (!lastVideo || lastVideo.link !== data.today_link) {
-    const newEntry = {
+  /* ---- old-videos history ---- */
+  const last = data.old_videos?.[0];
+  if (!last || last.link !== data.today_link) {
+    const entry = {
       title: data.title,
       description: data.description,
       link: data.today_link,
       thumbnail: data.thumbnail,
       date: new Date().toLocaleDateString('en-GB')
     };
-    data.old_videos = [newEntry, ...(data.old_videos || []).slice(0, 9)];
+    data.old_videos = [entry, ...(data.old_videos || []).slice(0, 9)];
   }
 
-  // === Save ===
+  /* ---- send to Cloudflare Worker ---- */
   saveBtn.disabled = true;
   saveBtn.textContent = "Saving...";
 
@@ -377,9 +375,9 @@ saveBtn.onclick = async () => {
     }
 
     showToast("Saved to GitHub!");
-    await loadData(); // Full refresh
+    await loadData();               // refresh everything
   } catch (e) {
-    console.error("Save error:", e);
+    console.error(e);
     showToast(`Save failed: ${e.message}`, true);
   } finally {
     saveBtn.disabled = false;
@@ -396,11 +394,7 @@ function escapeHtml(text) {
 
 /* === Init === */
 loadData();
-
-// Auto-show CMS if logged in
-if (sessionStorage.getItem('cmsAuth')) {
-  setTimeout(showCms, 500);
-}
+if (sessionStorage.getItem('cmsAuth')) setTimeout(showCms, 500);
 </script>
 </body>
 </html>
