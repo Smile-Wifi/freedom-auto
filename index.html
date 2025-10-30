@@ -1,135 +1,220 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Freedom Auto CMS</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-  <style>
-    body {
-      margin: 0; padding: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    header {
-      background: #222;
-      width: 100%;
-      padding: 10px 20px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px;
-    }
-    video {
-      width: 90%;
-      max-width: 600px;
-      border-radius: 12px;
-      background: #000;
-    }
-    .cms {
-      background: #1b1b1b;
-      padding: 20px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 10px #000;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border: none;
-      border-radius: 6px;
-    }
-    input { background: #333; color: #fff; }
-    button {
-      background: #00b894;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover { background: #019875; }
-    footer {
-      text-align: center;
-      padding: 10px;
-      font-size: 0.8em;
-      color: #777;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Freedom FM — Auto CMS</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<style>
+:root{
+  --bg:#111;--panel:#1b1b1b;--accent:#00b894;--muted:#777;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);color:#fff;display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;overflow-x:hidden;
+}
+header{
+  background:#222;width:100%;padding:18px;text-align:center;font-weight:bold;font-size:1.2em;
+  position:relative;z-index:10;
+}
+.menu-btn{position:absolute;right:14px;top:8px;background:none;border:none;color:#fff;font-size:1.6em;cursor:pointer;}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;backdrop-filter:blur(6px);
+  background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.3s;z-index:9;}
+.overlay.show{opacity:1;visibility:visible;}
+.sidebar{
+  position:fixed;left:-260px;top:0;width:240px;height:100%;background:rgba(20,20,20,.95);
+  box-shadow:2px 0 15px rgba(0,0,0,.5);transition:.3s;display:flex;flex-direction:column;padding-top:60px;z-index:10;
+}
+.sidebar.open{left:0;}
+.sidebar a,.sidebar button{
+  color:#fff;padding:12px 18px;text-decoration:none;background:none;border:none;text-align:left;font-size:1.05em;cursor:pointer;
+}
+.sidebar a:hover,.sidebar button:hover{background:#2c2c2c;}
+main{width:100%;max-width:980px;margin:18px;display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+.player-panel{background:var(--panel);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.6);}
+video{width:100%;border-radius:8px;background:#000;}
+.radio-box,.cms,.old-videos,.schedule-box{
+  background:var(--panel);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.5);
+}
+.small{font-size:.9em;color:var(--muted);}
+input[type=text],input[type=url]{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid #2a2a2a;background:#222;color:#fff;}
+.btn{display:inline-block;padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:bold;}
+.schedule-list{display:flex;flex-direction:column;gap:8px;}
+.sched-item{display:grid;grid-template-columns:100px 1fr 120px 34px;gap:6px;align-items:center;}
+.old-videos ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+.old-videos li{padding:8px;background:#151515;border-radius:6px;}
+@media(max-width:980px){main{grid-template-columns:1fr;}video{width:100%;}}
+</style>
 </head>
 <body>
-  <header>🎬 Freedom FM</header>
+<header>
+  <button class="menu-btn" id="menuBtn">☰</button>
+  🎬 Freedom FM CMS
+</header>
 
-  <main>
+<div class="overlay" id="overlay"></div>
+<div class="sidebar" id="sidebar">
+  <a href="https://smile-wifi.github.io/Main" target="_blank">🏠 Home</a>
+  <button id="cmsLink">⚙️ CMS Settings</button>
+  <button id="loginLink">🔐 Login</button>
+  <button id="logoutLink" style="color:#ff7675;">🚪 Logout</button>
+</div>
+
+<main>
+  <div class="player-panel">
     <video id="videoPlayer" controls autoplay muted loop></video>
+    <div style="margin-top:10px;font-weight:bold;" id="videoTitle"></div>
+    <div class="small" id="videoDesc"></div>
 
-    <div class="cms">
-      <h3>Update Daily Video</h3>
-      <input id="titleInput" placeholder="Title">
-      <input id="descInput" placeholder="Description">
-      <input id="linkInput" placeholder="Video URL (MP4)">
-      <input id="thumbInput" placeholder="Thumbnail URL">
-      <button id="saveBtn">Save to GitHub</button>
+    <div class="radio-box" style="margin-top:12px;">
+      <h3>🎧 Radio Live</h3>
+      <div id="radioTitleDisplay" style="font-weight:bold;"></div>
+      <div id="radioDesc" class="small"></div>
+      <audio id="radioPlayer" controls style="width:100%;margin-top:8px;"></audio>
+
+      <div class="schedule-box" style="margin-top:12px;">
+        <h3>📅 Program Schedule</h3>
+        <div id="scheduleDisplay" class="schedule-list"></div>
+      </div>
     </div>
-  </main>
+  </div>
 
-  <footer>© 2025 Smile WiFi — Auto PWA CMS</footer>
+  <div class="cms" id="cmsBox" style="display:none;">
+    <h3>Update Daily Video & Radio</h3>
+    <input id="titleInput" placeholder="Video Title">
+    <input id="descInput" placeholder="Video Description">
+    <input id="linkInput" placeholder="Video URL (MP4)">
+    <input id="thumbInput" placeholder="Thumbnail URL">
+    <input id="radioTitleInput" placeholder="Radio Program Title">
+    <input id="radioStreamInput" placeholder="Radio Stream URL">
+    <input id="radioDescInput" placeholder="Radio Description">
 
-  <script>
-    const DATA_URL = "https://smile-wifi.github.io/freedom-auto/data.json";
-    const WORKER_URL = "https://update-json.kaptenlanaja2024.workers.dev";
+    <h3>Editable Program Schedule</h3>
+    <div class="small">Add or edit radio programs below.</div>
+    <div id="scheduleEditor" class="schedule-list" style="margin-top:6px;"></div>
+    <button class="btn" id="addScheduleBtn">＋ Add Program</button>
+    <button class="btn" id="saveBtn" style="margin-top:6px;">💾 Save to GitHub</button>
+  </div>
 
-    async function loadData() {
-      try {
-        const res = await fetch(DATA_URL + '?v=' + Date.now());
-        const data = await res.json();
+  <div class="old-videos" id="oldVideosBox">
+    <h3>📺 Old Videos</h3>
+    <ul id="oldVideoList"></ul>
+  </div>
+</main>
 
-        document.getElementById('videoPlayer').src = data.today_link;
-        document.getElementById('titleInput').value = data.title || "";
-        document.getElementById('descInput').value = data.description || "";
-        document.getElementById('linkInput').value = data.today_link || "";
-        document.getElementById('thumbInput').value = data.thumbnail || "";
-      } catch (e) {
-        console.error(e);
-      }
-    }
+<footer style="text-align:center;padding:12px;color:var(--muted);">
+© 2025 Smile WiFi — Auto PWA CMS
+</footer>
 
-    document.getElementById('saveBtn').onclick = async () => {
-      const payload = {
-        title: document.getElementById('titleInput').value,
-        description: document.getElementById('descInput').value,
-        today_link: document.getElementById('linkInput').value,
-        thumbnail: document.getElementById('thumbInput').value
-      };
-      const res = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        alert("✅ data.json updated live!");
-        loadData();
-      } else {
-        alert("❌ Update failed. Check Worker settings.");
-      }
-    };
+<script>
+/* === CONFIG === */
+const DATA_URL="https://smile-wifi.github.io/freedom-auto/data.json";
+const WORKER_URL="https://update-json.kaptenlanaja2024.workers.dev";
+const PASSWORD="freedom2025";
 
-    loadData();
-  </script>
+/* === Sidebar === */
+const sidebar=document.getElementById('sidebar');
+const overlay=document.getElementById('overlay');
+document.getElementById('menuBtn').onclick=()=>{sidebar.classList.toggle('open');overlay.classList.toggle('show');};
+overlay.onclick=()=>{sidebar.classList.remove('open');overlay.classList.remove('show');};
+
+document.getElementById('loginLink').onclick=()=>{
+  const pw=prompt("Enter CMS password:");
+  if(pw===PASSWORD){sessionStorage.setItem('cmsAuth','true');alert("✅ Login successful");document.getElementById('cmsBox').style.display='block';}
+  else alert("❌ Incorrect password");
+};
+document.getElementById('logoutLink').onclick=()=>{
+  sessionStorage.removeItem('cmsAuth');document.getElementById('cmsBox').style.display='none';alert("👋 Logged out");
+};
+document.getElementById('cmsLink').onclick=()=>{
+  if(!sessionStorage.getItem('cmsAuth'))return alert("🔐 Login required first.");
+  document.getElementById('cmsBox').style.display='block';
+};
+
+/* === Data load / display === */
+let data={};
+async function loadData(){
+  try{
+    const r=await fetch(DATA_URL+'?v='+Date.now(),{cache:'no-store'});
+    data=await r.json();
+    document.getElementById('videoPlayer').src=data.today_link||'';
+    document.getElementById('videoTitle').innerText=data.title||'';
+    document.getElementById('videoDesc').innerText=data.description||'';
+    document.getElementById('radioPlayer').src=data.radio_stream||'';
+    document.getElementById('radioTitleDisplay').innerText=data.radio_title||'';
+    document.getElementById('radioDesc').innerText=data.radio_description||'';
+    fillCms();
+    renderSchedule();
+    renderOldVideos();
+  }catch(e){console.error(e);alert("❌ Cannot load data.json");}
+}
+function renderOldVideos(){
+  const ul=document.getElementById('oldVideoList');
+  ul.innerHTML='';
+  (data.old_videos||[]).forEach(v=>{
+    const li=document.createElement('li');
+    li.textContent=v.title+' — '+(v.date||'');
+    ul.appendChild(li);
+  });
+}
+function renderSchedule(){
+  const s=data.radio_schedule||[];
+  const box=document.getElementById('scheduleDisplay');box.innerHTML='';
+  s.forEach(i=>{
+    const d=document.createElement('div');
+    d.style.background='#151515';d.style.padding='6px';d.style.borderRadius='6px';
+    d.innerHTML=`<b>${i.time||''}</b> — ${i.program||''} <span style="color:#888">(${i.host||''})</span>`;
+    box.appendChild(d);
+  });
+}
+
+/* === CMS Fill and Edit === */
+function fillCms(){
+  titleInput.value=data.title||'';descInput.value=data.description||'';linkInput.value=data.today_link||'';thumbInput.value=data.thumbnail||'';
+  radioTitleInput.value=data.radio_title||'';radioStreamInput.value=data.radio_stream||'';radioDescInput.value=data.radio_description||'';
+  renderScheduleEditor();
+}
+function renderScheduleEditor(){
+  const edit=document.getElementById('scheduleEditor');
+  edit.innerHTML='';
+  const s=data.radio_schedule||[
+    {time:"06:00 AM",program:"Morning Vibes",host:"DJ Alex"},
+    {time:"09:00 AM",program:"News Hour",host:"Sarah Lee"},
+    {time:"12:00 PM",program:"Lunch Beats",host:"MC Jay"},
+    {time:"03:00 PM",program:"Afternoon Groove",host:"DJ Mia"},
+    {time:"06:00 PM",program:"Freedom Night Show",host:"Captain L"}
+  ];
+  data.radio_schedule=s;
+  s.forEach((r,i)=>{
+    const row=document.createElement('div');row.className='sched-item';
+    row.innerHTML=`<input value="${r.time||''}" placeholder="Time">
+                   <input value="${r.program||''}" placeholder="Program">
+                   <input value="${r.host||''}" placeholder="Host">
+                   <button style="background:none;border:none;color:#ff7675;cursor:pointer;">✖</button>`;
+    row.querySelector('button').onclick=()=>{data.radio_schedule.splice(i,1);renderScheduleEditor();};
+    edit.appendChild(row);
+  });
+}
+addScheduleBtn.onclick=()=>{data.radio_schedule.push({time:'',program:'',host:''});renderScheduleEditor();};
+
+/* === Save === */
+saveBtn.onclick=async()=>{
+  data.title=titleInput.value;data.description=descInput.value;
+  data.today_link=linkInput.value;data.thumbnail=thumbInput.value;
+  data.radio_title=radioTitleInput.value;data.radio_stream=radioStreamInput.value;data.radio_description=radioDescInput.value;
+  const rows=document.querySelectorAll('#scheduleEditor .sched-item');
+  data.radio_schedule=[...rows].map(r=>{const i=r.querySelectorAll('input');return{time:i[0].value,program:i[1].value,host:i[2].value};});
+  try{
+    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if(!res.ok)throw new Error('Worker update failed');
+    alert("✅ Saved to GitHub!");loadData();
+  }catch(e){alert("❌ Save failed.");console.error(e);}
+};
+
+loadData();
+</script>
 </body>
 </html>
