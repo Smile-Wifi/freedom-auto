@@ -1,246 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Freedom FM — Video Player</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-  <style>
-    :root {
-      --bg: #111;
-      --panel: #1b1b1b;
-      --accent: #00b894;
-      --muted: #777;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg); color: #fff; display: flex; flex-direction: column; align-items: center;
-      min-height: 100vh; overflow-x: hidden;
-    }
-    header {
-      background: #222; width: 100%; padding: 18px; text-align: center; font-weight: bold; font-size: 1.2em;
-      position: relative; z-index: 10;
-    }
-    .menu-btn {
-      position: absolute; right: 14px; top: 8px; background: none; border: none; color: #fff; font-size: 1.6em; cursor: pointer;
-    }
-    .overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(6px);
-      background: rgba(0,0,0,.45); opacity: 0; visibility: hidden; transition: .3s; z-index: 9;
-    }
-    .overlay.show { opacity: 1; visibility: visible; }
-    .sidebar {
-      position: fixed; left: -260px; top: 0; width: 240px; height: 100%; background: rgba(20,20,20,.95);
-      box-shadow: 2px 0 15px rgba(0,0,0,.5); transition: .3s; display: flex; flex-direction: column; padding-top: 60px; z-index: 10;
-    }
-    .sidebar.open { left: 0; }
-    .sidebar a, .sidebar button {
-      color: #fff; padding: 12px 18px; text-decoration: none; background: none; border: none; text-align: left; font-size: 1.05em; cursor: pointer;
-    }
-    .sidebar a:hover, .sidebar button:hover { background: #2c2c2c; }
-    main { width: 100%; max-width: 980px; margin: 18px; }
-    .player-panel {
-      background: var(--panel); padding: 16px; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.6);
-    }
-    video { width: 100%; border-radius: 8px; background: #000; }
-    .cms {
-      background: var(--panel); padding: 16px; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.5); margin-top: 18px;
-    }
-    input[type=text], input[type=url] {
-      width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #2a2a2a; background: #222; color: #fff; font-size: 1em;
-    }
-    .btn {
-      display: inline-block; padding: 10px 16px; border-radius: 8px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-weight: bold; font-size: 1em;
-    }
-    .btn:disabled { background: #555; cursor: not-allowed; opacity: 0.6; }
-    .toast {
-      position: fixed; bottom: 20px; right: 20px; background: #00b894; padding: 10px 18px; border-radius: 8px;
-      color: #fff; font-weight: bold; box-shadow: 0 0 10px #000; opacity: 0; transition: .4s; z-index: 100;
-    }
-    .toast.show { opacity: 1; }
-    .toast.error { background: #e74c3c; }
-    footer { text-align: center; padding: 12px; color: var(--muted); margin-top: auto; }
-    @media (max-width: 980px) { main { margin: 12px; } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Video Player CMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Hamburger Menu -->
+    <nav class="navbar">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <h1>Video CMS</h1>
+    </nav>
 
-<header>
-  <button class="menu-btn" id="menuBtn">Menu</button>
-  Freedom FM Video
-</header>
+    <!-- Side Panel -->
+    <div class="side-panel" id="sidePanel">
+        <div class="side-panel-header">
+            <h2>Menu</h2>
+            <button class="close-btn" id="closeBtn">&times;</button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#cms-login" class="nav-link" id="cmsLoginBtn"><i class="fas fa-cog"></i> CMS Login</a></li>
+            <li><a href="#settings" class="nav-link"><i class="fas fa-tools"></i> Settings</a></li>
+        </ul>
+    </div>
 
-<div class="overlay" id="overlay"></div>
-<div class="sidebar" id="sidebar">
-  <a href="https://smile-wifi.github.io/Main" target="_blank">Home</a>
-  <button id="cmsLink">CMS Settings</button>
-  <button id="loginLink">Login</button>
-  <button id="logoutLink" style="color:#ff7675;">Logout</button>
-</div>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
 
-<main>
-  <div class="player-panel">
-    <video id="videoPlayer" controls autoplay muted loop></video>
-    <div style="margin-top:10px; font-weight:bold;" id="videoTitle">Loading...</div>
-  </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="video-section">
+                <h2 id="videoTitle">Featured Facebook Video</h2>
+                <div class="video-container" id="videoContainer">
+                    <div class="facebook-video-container">
+                        <iframe 
+                            id="facebookVideo"
+                            src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Ffacebook%2Fvideos%2F10153231379946729%2F&show_text=false&width=476&t=0"
+                            width="100%"
+                            height="auto"
+                            style="border:none;overflow:hidden;aspect-ratio:16/9;"
+                            scrolling="no"
+                            frameborder="0"
+                            allowfullscreen="true"
+                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                            allowFullScreen="true">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-  <!-- Facebook-style CMS -->
-  <div class="cms" id="cmsBox" style="display:none;">
-    <h3>Update Video</h3>
-    <input id="titleInput" placeholder="Video Title">
-    <input id="linkInput" placeholder="Video URL (MP4)">
-    <button class="btn" id="saveBtn" style="margin-top:12px;">Save to GitHub</button>
-  </div>
-</main>
+    <!-- CMS Login Modal -->
+    <div class="modal" id="cmsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>CMS Login</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form id="cmsLoginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
 
-<footer>
-  © 2025 Smile WiFi — Video CMS
-</footer>
+    <!-- CMS Dashboard Modal -->
+    <div class="modal" id="cmsDashboard">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>CMS Dashboard</h2>
+                <button class="close-modal" id="closeDashboard">&times;</button>
+            </div>
+            <div class="cms-content">
+                <div class="form-group">
+                    <label for="facebookUrl">Facebook Video URL:</label>
+                    <input type="url" id="facebookUrl" placeholder="https://www.facebook.com/watch/?v=VIDEO_ID">
+                </div>
+                <div class="form-group">
+                    <label for="videoTitleInput">Video Title:</label>
+                    <input type="text" id="videoTitleInput" placeholder="Enter video title">
+                </div>
+                <button type="button" class="btn-primary" id="updateVideo">Update Video</button>
+                <button type="button" class="btn-secondary" id="saveToGitHub">Save to GitHub</button>
+                <div id="statusMessage" class="status-message"></div>
+            </div>
+        </div>
+    </div>
 
-<div id="toast" class="toast">Saved!</div>
-
-<script>
-/* === CONFIG === */
-const DATA_URL = "https://smile-wifi.github.io/freedom-auto/data.json";
-const WORKER_URL = "https://update-json.kaptenlanaja2024.workers.dev";
-const PASSWORD = "freedom2025";
-
-/* === DOM Elements === */
-const menuBtn     = document.getElementById('menuBtn');
-const sidebar     = document.getElementById('sidebar');
-const overlay     = document.getElementById('overlay');
-const cmsBox      = document.getElementById('cmsBox');
-const loginLink   = document.getElementById('loginLink');
-const logoutLink  = document.getElementById('logoutLink');
-const cmsLink     = document.getElementById('cmsLink');
-const saveBtn     = document.getElementById('saveBtn');
-
-const videoPlayer = document.getElementById('videoPlayer');
-const videoTitle  = document.getElementById('videoTitle');
-
-const titleInput  = document.getElementById('titleInput');
-const linkInput   = document.getElementById('linkInput');
-
-const toast       = document.getElementById('toast');
-
-/* === Sidebar === */
-menuBtn.onclick = () => {
-  sidebar.classList.toggle('open');
-  overlay.classList.toggle('show');
-};
-overlay.onclick = () => {
-  sidebar.classList.remove('open');
-  overlay.classList.remove('show');
-};
-
-/* === Auth === */
-loginLink.onclick = () => {
-  const pw = prompt("Enter CMS password:");
-  if (pw === PASSWORD) {
-    sessionStorage.setItem('cmsAuth', 'true');
-    showCms();
-    showToast("Logged in!");
-  } else {
-    alert("Incorrect password");
-  }
-};
-
-logoutLink.onclick = () => {
-  sessionStorage.removeItem('cmsAuth');
-  cmsBox.style.display = 'none';
-  showToast("Logged out");
-};
-
-cmsLink.onclick = () => {
-  if (!sessionStorage.getItem('cmsAuth')) return alert("Login required.");
-  showCms();
-};
-
-function showCms() { cmsBox.style.display = 'block'; }
-
-/* === Toast === */
-function showToast(msg, isError = false) {
-  toast.textContent = msg;
-  toast.className = 'toast' + (isError ? ' error' : '');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-/* === Load Data === */
-let data = {};
-
-async function loadData() {
-  try {
-    const r = await fetch(DATA_URL + '?v=' + Date.now(), { cache: 'no-store' });
-    if (!r.ok) throw new Error("Failed");
-    data = await r.json();
-  } catch (e) {
-    console.warn("Fallback data", e);
-    data = {
-      title: "Big Buck Bunny",
-      today_link: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    };
-  }
-  displayVideo();
-  if (sessionStorage.getItem('cmsAuth')) fillCms();
-}
-
-function displayVideo() {
-  videoPlayer.src = data.today_link || '';
-  videoTitle.innerText = data.title || 'No Title';
-  videoPlayer.load();
-}
-
-/* === CMS Fill === */
-function fillCms() {
-  titleInput.value = data.title || '';
-  linkInput.value  = data.today_link || '';
-}
-
-/* === SAVE === */
-saveBtn.onclick = async () => {
-  const newTitle = titleInput.value.trim();
-  const newLink  = linkInput.value.trim();
-
-  if (!newTitle || !newLink) {
-    return showToast("Title and URL are required!", true);
-  }
-
-  saveBtn.disabled = true;
-  saveBtn.textContent = "Saving...";
-
-  const payload = { title: newTitle, today_link: newLink };
-
-  try {
-    const res = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: "Failed" }));
-      throw new Error(err.error || "HTTP " + res.status);
-    }
-
-    showToast("Saved! Video updated.");
-    data = payload;
-    displayVideo();
-  } catch (e) {
-    console.error(e);
-    showToast("Save failed: " + e.message, true);
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = "Save to GitHub";
-  }
-};
-
-/* === Init === */
-loadData();
-if (sessionStorage.getItem('cmsAuth')) setTimeout(showCms, 500);
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
