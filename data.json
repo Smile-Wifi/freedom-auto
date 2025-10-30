@@ -1,0 +1,38 @@
+{
+  "title": "Big Buck Bunny",
+  "description": "A fun animated short film about a big bunny and his forest friends.",
+  "today_link": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  "thumbnail": "https://peach.blender.org/wp-content/uploads/title_anouncement.jpg",
+
+  "radio_title": "Freedom FM Live",
+  "radio_stream": "http://icecast.omroep.nl/3fm-sb-mp3",
+  "radio_description": "Your daily source of hits, news, and community updates from Freedom FM!",
+
+  "radio_schedule": [
+    { "time": "06:00 AM", "program": "Morning Vibes", "host": "DJ Alex" },
+    { "time": "09:00 AM", "program": "News Hour", "host": "Sarah Lee" },
+    { "time": "12:00 PM", "program": "Lunch Beats", "host": "MC Jay" },
+    { "time": "03:00 PM", "program": "Afternoon Groove", "host": "DJ Mia" },
+    { "time": "06:00 PM", "program": "Freedom Night Show", "host": "Captain L" }
+  ],
+
+  "old_videos": [
+    {
+      "title": "Elephants Dream",
+      "date": "2024-09-10",
+      "link": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    },
+    {
+      "title": "Sintel",
+      "date": "2024-08-01",
+      "link": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+    },
+    {
+      "title": "Tears of Steel",
+      "date": "2024-06-18",
+      "link": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    }
+  ],
+
+  "updated": "2025-10-30"
+}
